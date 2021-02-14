@@ -27,6 +27,22 @@
 #include "FX.h"
 #include "palettes.h"
 
+
+#include "my92xx.h"
+
+
+#define MY92XX_MODEL        MY92XX_MODEL_MY9291
+#define MY92XX_CHIPS        1
+#define MY92XX_DI_PIN       13
+#define MY92XX_DCKI_PIN     15
+
+#define MY92XX_RED          0
+#define MY92XX_GREEN        1
+#define MY92XX_BLUE         2
+#define MY92XX_WHITE        3
+
+my92xx _my92xx = my92xx(MY92XX_MODEL, MY92XX_CHIPS, MY92XX_DI_PIN, MY92XX_DCKI_PIN, MY92XX_COMMAND_DEFAULT);
+
 //enable custom per-LED mapping. This can allow for better effects on matrices or special displays
 //#define WLED_CUSTOM_LED_MAPPING
 
@@ -65,6 +81,8 @@ void WS2812FX::init(bool supportWhite, uint16_t countPixels, bool skipFirst)
   _segments[0].stop = _length;
 
   setBrightness(_brightness);
+
+  _my92xx.setState(true);
 }
 
 void WS2812FX::service() {
@@ -302,6 +320,16 @@ void WS2812FX::show(void) {
   }
   
   bus->Show();
+  uint32_t c = getPixelColor(0);
+  int w = ((c >> 24) & 0xff) * _brightness / 255.0;
+  int r = ((c >> 16) & 0xff) * _brightness / 255.0;
+  int g = ((c >>  8) & 0xff) * _brightness / 255.0;
+  int b =  (c        & 0xff) * _brightness / 255.0;
+  _my92xx.setChannel(MY92XX_RED, r);
+  _my92xx.setChannel(MY92XX_GREEN, g);
+  _my92xx.setChannel(MY92XX_BLUE, b);
+  _my92xx.setChannel(MY92XX_WHITE, w);
+  _my92xx.update();
   _lastShow = millis();
 }
 

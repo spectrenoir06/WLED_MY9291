@@ -38,7 +38,6 @@ uint16_t WS2812FX::mode_static(void) {
   return (SEGMENT.getOption(SEG_OPTION_TRANSITIONAL)) ? FRAMETIME : 500; //update faster if in transition
 }
 
-
 /*
  * Blink/strobe function
  * Alternate between color1 and color2
